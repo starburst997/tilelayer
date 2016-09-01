@@ -53,7 +53,7 @@ class TileLayer extends TileGroup
 		drawList.begin(elapsed == null ? 0 : elapsed, useTransforms, useAlpha, useTint, useAdditive);
 		renderGroup(this, 0, 0, 0);
 		drawList.end();
-		#if flash
+		#if (flash || openfl >= "4.0.0")
 		view.addChild(container);
 		#else
 		view.graphics.clear();
@@ -71,7 +71,7 @@ class TileLayer extends TileGroup
 		var offsetAlpha = drawList.offsetAlpha;
 		var elapsed = drawList.elapsed;
 
-		#if flash
+		#if (flash || openfl >= "4.0.0")
 		group.container.x = gx + group.x;
 		group.container.y = gy + group.y;
 		var blend = useAdditive ? BlendMode.ADD : BlendMode.NORMAL;
@@ -86,7 +86,7 @@ class TileLayer extends TileGroup
 			var child = group.children[i];
 			if (child.animated) child.step(elapsed);
 
-			#if !flash
+			#if (!flash && openfl < "4.0.0")
 			if (!child.visible) continue;
 			#end
 			
@@ -104,7 +104,7 @@ class TileLayer extends TileGroup
 			{
 				var sprite:TileSprite = cast child;
 
-				#if flash
+				#if (flash || openfl >= "4.0.0")
 				if (sprite.parent.visible && sprite.visible && sprite.alpha > 0.0)
 				{
 					var m = sprite.bmp.transform.matrix;
@@ -197,7 +197,7 @@ class TileBase
 	{
 	}
 
-	#if flash
+	#if (flash || openfl >= "4.0.0")
 	public function getView():DisplayObject { return null; }
 	#end
 }
@@ -228,7 +228,7 @@ private class DrawList
 
 	public function begin(elapsed:Int, useTransforms:Bool, useAlpha:Bool, useTint:Bool, useAdditive:Bool) 
 	{
-		#if !flash
+		#if (!flash && openfl < "4.0.0")
 		flags = 0;
 		fields = 3;
 		if (useTransforms) {

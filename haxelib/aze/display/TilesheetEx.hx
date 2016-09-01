@@ -2,9 +2,14 @@ package aze.display;
 
 import openfl.Assets;
 import openfl.display.BitmapData;
-import openfl.display.Tilesheet;
 import openfl.geom.Point;
 import openfl.geom.Rectangle;
+
+#if (openfl < "4.0.0")
+import openfl.display.Tilesheet;
+#else
+import openfl.display.Tileset;
+#end
 
 using StringTools;
 
@@ -18,14 +23,14 @@ using StringTools;
  *
  * @author Philippe / http://philippe.elsass.me
  */
-class TilesheetEx extends Tilesheet
+class TilesheetEx extends #if (openfl < "4.0.0") Tilesheet #else Tileset #end
 {
 	public var scale:Float;
 	var defs:Array<String>;
 	var sizes:Array<Rectangle>;
 	var anims:Map<String, Array<Int>>;
 	var tiles:Map<String, Int>;
-	#if flash
+	#if (flash || openfl >= "4.0.0")
 	var bmps:Array<BitmapData>;
 	#end
 
@@ -38,12 +43,12 @@ class TilesheetEx extends Tilesheet
 		anims = new Map<String, Array<Int>>();
 		tiles = new Map<String, Int>();
 		sizes = new Array<Rectangle>();
-		#if flash
+		#if (flash || openfl >= "4.0.0")
 		bmps = new Array<BitmapData>();
 		#end
 	}
 
-	#if flash
+	#if (flash || openfl >= "4.0.0")
 	public function addDefinition(name:String, size:Rectangle, bmp:BitmapData)
 	{
 		defs.push(name);
@@ -110,7 +115,7 @@ class TilesheetEx extends Tilesheet
 		else return new Rectangle();
 	}
 
-	#if flash
+	#if (flash || openfl >= "4.0.0")
 	inline public function getBitmap(indice:Int):BitmapData
 	{
 		return bmps[indice];
@@ -166,7 +171,7 @@ class TilesheetEx extends Tilesheet
 		{
 			var image = images[i];
 			img.copyPixels(image, image.rect, pos, null, null, true);
-			#if flash
+			#if (flash || openfl >= "4.0.0")
 			sheet.addDefinition(names[i], image.rect, image);
 			#else
 			var rect = new Rectangle(padding, pos.y, image.width, image.height);

@@ -25,7 +25,7 @@ class TileSprite extends TileBase
 	var _mirror:Int;
 	var _offset:Point;
 
-	#if !flash
+	#if (!flash && openfl < "4.0.0")
 	var _transform:Array<Float>;
 	#else
 	var _matrix:Matrix;
@@ -44,7 +44,7 @@ class TileSprite extends TileBase
 		alpha = _scaleX = _scaleY = 1;
 		_mirror = 0;
 		_indice = -1;
-		#if flash
+		#if (flash || openfl >= "4.0.0")
 		bmp = new Bitmap();
 		_matrix = new Matrix();
 		#else
@@ -61,7 +61,7 @@ class TileSprite extends TileBase
 		size = layer.tilesheet.getSize(indice);
 	}
 
-	#if flash
+	#if (flash || openfl >= "4.0.0")
 	override public function getView():DisplayObject { return bmp; }
 	#end
 
@@ -83,7 +83,7 @@ class TileSprite extends TileBase
 		if (_indice != value)
 		{
 			_indice = value;
-			#if flash
+			#if (flash || openfl >= "4.0.0")
 			bmp.bitmapData = layer.tilesheet.getBitmap(value);
 			bmp.smoothing = layer.useSmoothing;
 			#end
@@ -162,7 +162,7 @@ class TileSprite extends TileBase
 		return value;
 	}
 
-	#if !flash
+	#if (!flash && openfl < "4.0.0")
 	public var transform(get_transform, null):Array<Float>;
 	function get_transform():Array<Float>
 	{

@@ -43,7 +43,7 @@ class SparrowTilesheet extends TilesheetEx
 				else 
 					new Rectangle(0, 0, rect.width, rect.height);
 			
-			#if flash
+			#if (flash || openfl >= "4.0.0")
 			var bmp = new BitmapData(cast size.width, cast size.height, true, 0);
 			ins.x = -size.left;
 			ins.y = -size.top;
