@@ -155,7 +155,6 @@ class TileLayer extends TileGroup
 					m.concat(sprite.matrix);
 					m.translate(sprite.x + gx, sprite.y + gy);
 					sprite.t.matrix = m;
-					sprite.t.x = sprite.x + gx;
 					//sprite.bmp.blendMode = blend;
 					sprite.t.alpha = sprite.alpha;
 					sprite.t.visible = true;
