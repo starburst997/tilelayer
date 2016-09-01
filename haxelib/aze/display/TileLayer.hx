@@ -6,6 +6,10 @@ import openfl.display.BlendMode;
 import openfl.display.DisplayObject;
 import openfl.display.Graphics;
 import openfl.display.Sprite;
+#if (openfl >= "4.0.0")
+import openfl.display.Tilemap;
+import openfl.events.Event;
+#end
 import openfl.geom.Matrix;
 import openfl.geom.Point;
 import openfl.geom.Rectangle;
@@ -30,6 +34,9 @@ class TileLayer extends TileGroup
 
 	public var tilesheet:TilesheetEx;
 	var drawList:DrawList;
+	#if (openfl >= "4.0.0")
+	var tilemap:Tilemap;
+	#end
 
 	public function new(tilesheet:TilesheetEx, smooth:Bool=true, additive:Bool=false)
 	{
@@ -38,6 +45,22 @@ class TileLayer extends TileGroup
 		view = new Sprite();
 		view.mouseEnabled = false;
 		view.mouseChildren = false;
+
+		#if (openfl >= "4.0.0")
+		tilemap = new Tilemap(100, 100, tilesheet);
+		view.addChild(tilemap);
+		// TODO: Should we calculate size differently?
+		view.addEventListener(Event.ADDED_TO_STAGE, function(_)
+		{
+			tilemap.width = view.stage.stageWidth;
+			tilemap.height = view.stage.stageHeight;
+			view.stage.addEventListener(Event.RESIZE, function(_)
+			{
+				tilemap.width = view.stage.stageWidth;
+				tilemap.height = view.stage.stageHeight;
+			});
+		});
+		#end
 
 		this.tilesheet = tilesheet;
 		useSmoothing = smooth;
@@ -50,12 +73,16 @@ class TileLayer extends TileGroup
 
 	public function render(?elapsed:Int)
 	{
+		#if (openfl >= "4.0.0")
+		// TODO: Smarter solution that does not require clearing all tiles each render
+		tilemap.removeTiles();
+		#end
 		drawList.begin(elapsed == null ? 0 : elapsed, useTransforms, useAlpha, useTint, useAdditive);
 		renderGroup(this, 0, 0, 0);
 		drawList.end();
-		#if (flash || openfl >= "4.0.0")
+		#if flash
 		view.addChild(container);
-		#else
+		#elseif (openfl < "4.0.0")
 		view.graphics.clear();
 		tilesheet.drawTiles(view.graphics, drawList.list, useSmoothing, drawList.flags);
 		#end
@@ -71,7 +98,7 @@ class TileLayer extends TileGroup
 		var offsetAlpha = drawList.offsetAlpha;
 		var elapsed = drawList.elapsed;
 
-		#if (flash || openfl >= "4.0.0")
+		#if flash
 		group.container.x = gx + group.x;
 		group.container.y = gy + group.y;
 		var blend = useAdditive ? BlendMode.ADD : BlendMode.NORMAL;
@@ -104,7 +131,7 @@ class TileLayer extends TileGroup
 			{
 				var sprite:TileSprite = cast child;
 
-				#if (flash || openfl >= "4.0.0")
+				#if flash
 				if (sprite.parent.visible && sprite.visible && sprite.alpha > 0.0)
 				{
 					var m = sprite.bmp.transform.matrix;
@@ -119,7 +146,25 @@ class TileLayer extends TileGroup
 					// TODO apply tint
 				}
 				else sprite.bmp.visible = false;
-
+				#elseif (openfl >= "4.0.0")
+				if (sprite.parent.visible && sprite.visible && sprite.alpha > 0.0)
+				{
+					var m = sprite.t.matrix;
+					m.identity();
+					if (sprite.offset != null) m.translate(-sprite.offset.x, -sprite.offset.y);
+					m.concat(sprite.matrix);
+					m.translate(sprite.x + gx, sprite.y + gy);
+					sprite.t.matrix = m;
+					sprite.t.x = sprite.x + gx;
+					//sprite.bmp.blendMode = blend;
+					sprite.t.alpha = sprite.alpha;
+					sprite.t.visible = true;
+					sprite.t.id = sprite.indice;
+					// TODO apply tint
+					// TODO: Smarter solution that does not require re-adding tiles to tilemap
+					tilemap.addTile(sprite.t);
+				}
+				else sprite.t.visible = false;
 				#else
 				if (sprite.alpha <= 0.0) continue;
 				list[index+2] = sprite.indice;
@@ -197,7 +242,7 @@ class TileBase
 	{
 	}
 
-	#if (flash || openfl >= "4.0.0")
+	#if flash
 	public function getView():DisplayObject { return null; }
 	#end
 }

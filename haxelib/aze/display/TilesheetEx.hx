@@ -30,7 +30,7 @@ class TilesheetEx extends #if (openfl < "4.0.0") Tilesheet #else Tileset #end
 	var sizes:Array<Rectangle>;
 	var anims:Map<String, Array<Int>>;
 	var tiles:Map<String, Int>;
-	#if (flash || openfl >= "4.0.0")
+	#if flash
 	var bmps:Array<BitmapData>;
 	#end
 
@@ -43,12 +43,12 @@ class TilesheetEx extends #if (openfl < "4.0.0") Tilesheet #else Tileset #end
 		anims = new Map<String, Array<Int>>();
 		tiles = new Map<String, Int>();
 		sizes = new Array<Rectangle>();
-		#if (flash || openfl >= "4.0.0")
+		#if flash
 		bmps = new Array<BitmapData>();
 		#end
 	}
 
-	#if (flash || openfl >= "4.0.0")
+	#if flash
 	public function addDefinition(name:String, size:Rectangle, bmp:BitmapData)
 	{
 		defs.push(name);
@@ -69,7 +69,11 @@ class TilesheetEx extends #if (openfl < "4.0.0") Tilesheet #else Tileset #end
 			center.x /= scale;
 			center.y /= scale;
 		}
+		#if (openfl >= "4.0.0")
+		addRect(rect);
+		#else
 		addTileRect(rect, center);
+		#end
 	}
 	#end
 
@@ -115,7 +119,7 @@ class TilesheetEx extends #if (openfl < "4.0.0") Tilesheet #else Tileset #end
 		else return new Rectangle();
 	}
 
-	#if (flash || openfl >= "4.0.0")
+	#if flash
 	inline public function getBitmap(indice:Int):BitmapData
 	{
 		return bmps[indice];
@@ -171,7 +175,7 @@ class TilesheetEx extends #if (openfl < "4.0.0") Tilesheet #else Tileset #end
 		{
 			var image = images[i];
 			img.copyPixels(image, image.rect, pos, null, null, true);
-			#if (flash || openfl >= "4.0.0")
+			#if flash
 			sheet.addDefinition(names[i], image.rect, image);
 			#else
 			var rect = new Rectangle(padding, pos.y, image.width, image.height);

@@ -5,6 +5,9 @@ import aze.display.TileLayer;
 import openfl.geom.Matrix;
 import openfl.display.Bitmap;
 import openfl.display.DisplayObject;
+#if (openfl >= "4.0.0")
+import openfl.display.Tile;
+#end
 import openfl.geom.Point;
 import openfl.geom.Rectangle;
 
@@ -25,7 +28,10 @@ class TileSprite extends TileBase
 	var _mirror:Int;
 	var _offset:Point;
 
-	#if (!flash && openfl < "4.0.0")
+	#if (openfl >= "4.0.0")
+	public var t:Tile;
+	var _matrix:Matrix;
+	#elseif !flash
 	var _transform:Array<Float>;
 	#else
 	var _matrix:Matrix;
@@ -44,8 +50,11 @@ class TileSprite extends TileBase
 		alpha = _scaleX = _scaleY = 1;
 		_mirror = 0;
 		_indice = -1;
-		#if (flash || openfl >= "4.0.0")
+		#if flash
 		bmp = new Bitmap();
+		_matrix = new Matrix();
+		#elseif (openfl >= "4.0.0")
+		t = new Tile();
 		_matrix = new Matrix();
 		#else
 		_transform = new Array<Float>();
@@ -61,7 +70,7 @@ class TileSprite extends TileBase
 		size = layer.tilesheet.getSize(indice);
 	}
 
-	#if (flash || openfl >= "4.0.0")
+	#if flash
 	override public function getView():DisplayObject { return bmp; }
 	#end
 
@@ -83,7 +92,7 @@ class TileSprite extends TileBase
 		if (_indice != value)
 		{
 			_indice = value;
-			#if (flash || openfl >= "4.0.0")
+			#if flash
 			bmp.bitmapData = layer.tilesheet.getBitmap(value);
 			bmp.smoothing = layer.useSmoothing;
 			#end
