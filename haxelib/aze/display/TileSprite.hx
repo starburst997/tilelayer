@@ -28,7 +28,7 @@ class TileSprite extends TileBase
 	var _mirror:Int;
 	var _offset:Point;
 
-	#if (openfl >= "4.0.0")
+	#if (!flash && openfl >= "4.0.0")
 	public var t:Tile;
 	var _matrix:Matrix;
 	#elseif !flash
