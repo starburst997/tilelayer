@@ -38,7 +38,7 @@ class TileLayer extends TileGroup
 	var tilemap:Tilemap;
 	#end
 
-	public function new(tilesheet:TilesheetEx, smooth:Bool=true, additive:Bool=false)
+	public function new(tilesheet:TilesheetEx, width:Int, height:Int, smooth:Bool=true, additive:Bool=false)
 	{
 		super(this);
 
@@ -47,19 +47,8 @@ class TileLayer extends TileGroup
 		view.mouseChildren = false;
 
 		#if (openfl >= "4.0.0")
-		tilemap = new Tilemap(100, 100, tilesheet);
+		tilemap = new Tilemap(width, height, tilesheet);
 		view.addChild(tilemap);
-		// TODO: Should we calculate size differently?
-		view.addEventListener(Event.ADDED_TO_STAGE, function(_)
-		{
-			tilemap.width = view.stage.stageWidth;
-			tilemap.height = view.stage.stageHeight;
-			view.stage.addEventListener(Event.RESIZE, function(_)
-			{
-				tilemap.width = view.stage.stageWidth;
-				tilemap.height = view.stage.stageHeight;
-			});
-		});
 		#end
 
 		this.tilesheet = tilesheet;
